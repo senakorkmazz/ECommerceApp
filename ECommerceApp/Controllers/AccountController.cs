@@ -70,7 +70,6 @@ namespace ECommerceApp.Controllers
             return View();
         }
 
-        // Giriş İşlemi (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model) // Ayrı bir ViewModel kullanmak daha iyi
@@ -84,6 +83,13 @@ namespace ECommerceApp.Controllers
                     // Giriş başarılı - Session'a kullanıcı adını kaydet
                     HttpContext.Session.SetString("Username", user.Username);
                     HttpContext.Session.SetInt32("UserId", user.Id); // Kullanıcı ID'sini de saklayabiliriz
+
+                    // Check if there's a return URL in TempData
+                    if (TempData["ReturnUrl"] != null)
+                    {
+                        string returnUrl = TempData["ReturnUrl"].ToString();
+                        return Redirect(returnUrl);
+                    }
 
                     return RedirectToAction("Index", "Home"); // Ana sayfaya yönlendir
                 }

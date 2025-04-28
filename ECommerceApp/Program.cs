@@ -21,7 +21,7 @@ builder.Services.Configure<MongoDbSettings>(
 
 // MongoDB Servisini Singleton olarak ekle (veya Scoped/Transient ihtiyaca göre)
 // IOptions<MongoDbSettings> baðýmlýlýðýný otomatik çözer.
-builder.Services.AddScoped<ProductMongoService>();
+builder.Services.AddScoped<ProductService>();
 // Veya AddScoped<ProductMongoService>();
 
 // --- Controller ve View Servisleri ---

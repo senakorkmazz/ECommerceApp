@@ -8,12 +8,12 @@ using MongoDB.Bson;
 
 namespace ECommerceApp.Services
 {
-    public class ProductMongoService
+    public class ProductService
     {
         private readonly IMongoCollection<Product> _productsCollection;
         private readonly ApplicationDbContext _sqlDbContext;
 
-        public ProductMongoService(IOptions<MongoDbSettings> mongoDbSettings, ApplicationDbContext sqlDbContext)
+        public ProductService(IOptions<MongoDbSettings> mongoDbSettings, ApplicationDbContext sqlDbContext)
         {
             var mongoClient = new MongoClient(mongoDbSettings.Value.ConnectionString);
             var mongoDatabase = mongoClient.GetDatabase(mongoDbSettings.Value.DatabaseName);
