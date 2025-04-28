@@ -10,6 +10,6 @@ namespace ECommerceApp.Models
         public string Username { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Şifre zorunludur.")]
-        public string PasswordHash { get; set; } = string.Empty; // Güvenlik için hash'lenmiş şifre
+        public string PasswordHash { get; set; } = string.Empty; 
     }
 }

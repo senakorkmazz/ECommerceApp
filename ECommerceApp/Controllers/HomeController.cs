@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using ECommerceApp.Models; // ErrorViewModel için
+using ECommerceApp.Models;
 
 namespace ECommerceApp.Controllers
 {
@@ -12,12 +12,10 @@ namespace ECommerceApp.Controllers
         {
             _logger = logger;
         }
-
-        // Ana sayfayý direkt ürün listesine yönlendir
         public IActionResult Index()
         {
-            //return View(); // Varsayýlan View'i göstermek yerine
-            return RedirectToAction("Index", "Product"); // Product Controller'ýndaki Index action'ýna yönlendir
+           
+            return RedirectToAction("Index", "Product"); 
         }
 
         public IActionResult Privacy()

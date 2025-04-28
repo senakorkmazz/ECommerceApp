@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; // Include Eager Loading için
-using System.Linq; // FirstOrDefaultAsync için
-using System.Threading.Tasks; // async/await için
-using System.Security.Cryptography; // Basit Hashleme için
-using System.Text; // Encoding için
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Http;
 using ECommerceApp.Data;
 using ECommerceApp.Models;
-using System.ComponentModel.DataAnnotations; // Session için
+using System.ComponentModel.DataAnnotations;
 
 namespace ECommerceApp.Controllers
 {
@@ -20,8 +20,6 @@ namespace ECommerceApp.Controllers
             _context = context;
         }
 
-        // Basit ve GÜVENSİZ Hashleme Fonksiyonu - SADECE DEMO AMAÇLIDIR!
-        // GERÇEK UYGULAMALARDA ASLA KULLANMAYIN! BCrypt.Net gibi kütüphaneler kullanın.
         private string HashPassword(string password)
         {
             using (var sha256 = SHA256.Create())
@@ -31,20 +29,18 @@ namespace ECommerceApp.Controllers
             }
         }
 
-        // Kayıt Sayfası (GET)
         public IActionResult Register()
         {
             return View();
         }
 
-        // Kayıt İşlemi (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(User user)
         {
             if (ModelState.IsValid)
             {
-                // Kullanıcı adı zaten var mı?
+                
                 var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
                 if (existingUser != null)
                 {
@@ -52,19 +48,16 @@ namespace ECommerceApp.Controllers
                     return View(user);
                 }
 
-                // Şifreyi hash'le (Demo amaçlı basit hash)
-                user.PasswordHash = HashPassword(user.PasswordHash); // Modeldeki alan adını PasswordHash varsaydık
+                user.PasswordHash = HashPassword(user.PasswordHash);
 
                 _context.Add(user);
                 await _context.SaveChangesAsync();
 
-                // Kayıt sonrası login sayfasına yönlendir
                 return RedirectToAction(nameof(Login));
             }
             return View(user);
         }
 
-        // Giriş Sayfası (GET)
         public IActionResult Login()
         {
             return View();
@@ -72,7 +65,7 @@ namespace ECommerceApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model) // Ayrı bir ViewModel kullanmak daha iyi
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -80,18 +73,10 @@ namespace ECommerceApp.Controllers
 
                 if (user != null && user.PasswordHash == HashPassword(model.Password))
                 {
-                    // Giriş başarılı - Session'a kullanıcı adını kaydet
                     HttpContext.Session.SetString("Username", user.Username);
-                    HttpContext.Session.SetInt32("UserId", user.Id); // Kullanıcı ID'sini de saklayabiliriz
+                    HttpContext.Session.SetInt32("UserId", user.Id);
 
-                    // Check if there's a return URL in TempData
-                    if (TempData["ReturnUrl"] != null)
-                    {
-                        string returnUrl = TempData["ReturnUrl"].ToString();
-                        return Redirect(returnUrl);
-                    }
-
-                    return RedirectToAction("Index", "Home"); // Ana sayfaya yönlendir
+                    return RedirectToAction("Index", "Product");
                 }
                 else
                 {
@@ -101,17 +86,16 @@ namespace ECommerceApp.Controllers
             return View(model);
         }
 
-        // Çıkış İşlemi (POST)
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Logout()
         {
-            HttpContext.Session.Clear(); // Session'ı temizle
-            return RedirectToAction("Index", "Home"); // Ana sayfaya yönlendir
+            HttpContext.Session.Clear(); 
+            return RedirectToAction("Index", "Home");
         }
     }
 
-    // Basit Login ViewModel'ı (Models klasörüne veya ayrı bir ViewModels klasörüne koyabilirsiniz)
     public class LoginViewModel
     {
         [Required(ErrorMessage = "Kullanıcı adı zorunludur.")]

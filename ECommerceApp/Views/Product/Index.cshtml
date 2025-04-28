@@ -4,11 +4,31 @@
     ViewData["Title"] = "Ürünler";
 }
 
-<h1>Ürün Listesi (MongoDB'den)</h1>
+<h1>Ürün Listesi</h1>
 
-<p>
-    <a asp-action="Add" class="btn btn-primary">Yeni Ürün Ekle</a>
-</p>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Context.Session.GetString("Username")))
+{
+    <p>
+        <a asp-action="Add" class="btn btn-primary">Yeni Ürün Ekle</a>
+    </p>
+}
+
 <table class="table">
     <thead>
         <tr>
@@ -21,13 +41,10 @@
             <th>
                 @Html.DisplayNameFor(model => model.Price)
             </th>
-            <th>
-                SQL ID
-            </th>
-            <th>
-                Mongo ID
-            </th>
-            <th>İşlemler</th>
+            @if (!string.IsNullOrEmpty(Context.Session.GetString("Username")))
+            {
+                <th>İşlemler</th>
+            }
         </tr>
     </thead>
     <tbody>
@@ -43,21 +60,31 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Price)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.MongoId)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.MongoId" class="btn btn-warning btn-sm">Düzenle</a> |
-                    <form asp-action="Delete" asp-route-id="@item.MongoId" method="post" style="display: inline;">
-                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bu ürünü silmek istediğinizden emin misiniz?');">
-                            Sil
-                        </button>
-                    </form>
-                </td>
+                @if (!string.IsNullOrEmpty(Context.Session.GetString("Username")))
+                {
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a asp-action="Edit" asp-route-id="@item.MongoId" class="btn btn-warning btn-sm">Düzenle</a>
+                            <form asp-action="Delete" asp-route-id="@item.MongoId" method="post" style="display: inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger btn-sm ms-1"
+                                        onclick="return confirm('Bu ürünü silmek istediğinizden emin misiniz?');">
+                                    Sil
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                }
             </tr>
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        
+        setTimeout(function () {
+            $('.alert').alert('close');
+        }, 3000); 
+    </script>
+}

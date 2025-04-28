@@ -36,7 +36,6 @@ namespace ECommerceApp.Services
             await _productsCollection.InsertOneAsync(newProduct);
         }
 
-        // Yeni eklenen metodlar
         public async Task<Product> GetProductAsync(string mongoId)
         {
             return await _productsCollection.Find(p => p.MongoId == mongoId).FirstOrDefaultAsync();
@@ -44,33 +43,49 @@ namespace ECommerceApp.Services
 
         public async Task UpdateProductAsync(string mongoId, Product updatedProduct)
         {
-            // MongoDB'de güncelle
-            await _productsCollection.ReplaceOneAsync(
-                p => p.MongoId == mongoId,
-                updatedProduct);
-
-            // SQL'de güncelle
-            var sqlProduct = await _sqlDbContext.Products.FindAsync(updatedProduct.Id);
-            if (sqlProduct != null)
+            try
             {
-                sqlProduct.Name = updatedProduct.Name;
-                sqlProduct.Description = updatedProduct.Description;
-                sqlProduct.Price = updatedProduct.Price;
-                await _sqlDbContext.SaveChangesAsync();
+                var existingProduct = await _productsCollection.Find(p => p.MongoId == mongoId).FirstOrDefaultAsync();
+                if (existingProduct == null)
+                {
+                    throw new Exception("Ürün bulunamadı");
+                }
+
+                var filter = Builders<Product>.Filter.Eq(p => p.MongoId, mongoId);
+                var update = Builders<Product>.Update
+                    .Set(p => p.Name, updatedProduct.Name)
+                    .Set(p => p.Description, updatedProduct.Description)
+                    .Set(p => p.Price, updatedProduct.Price);
+
+                await _productsCollection.UpdateOneAsync(filter, update);
+
+                var sqlProduct = await _sqlDbContext.Products.FindAsync(updatedProduct.Id);
+                if (sqlProduct != null)
+                {
+                    sqlProduct.Name = updatedProduct.Name;
+                    sqlProduct.Description = updatedProduct.Description;
+                    sqlProduct.Price = updatedProduct.Price;
+                    await _sqlDbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Ürün güncellenirken bir hata oluştu: {ex.Message}");
             }
         }
 
+
         public async Task DeleteProductAsync(string mongoId)
         {
-            // Önce ürünü bul
+           
             var product = await _productsCollection.Find(p => p.MongoId == mongoId).FirstOrDefaultAsync();
 
             if (product != null)
             {
-                // MongoDB'den sil
+                
                 await _productsCollection.DeleteOneAsync(p => p.MongoId == mongoId);
 
-                // SQL'den sil
+                
                 var sqlProduct = await _sqlDbContext.Products.FindAsync(product.Id);
                 if (sqlProduct != null)
                 {

@@ -18,8 +18,7 @@
                 <label asp-for="Username"></label>
                 <span asp-validation-for="Username" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                @* Modeldeki property adı PasswordHash olsa bile, input type="password" olmalı *@
+            <div class="form-floating mb-3">               
                 <input asp-for="PasswordHash" class="form-control" type="password" autocomplete="new-password" aria-required="true" />
                 <label asp-for="PasswordHash">Şifre</label>
                 <span asp-validation-for="PasswordHash" class="text-danger"></span>

@@ -12,21 +12,17 @@ public class ProductController : Controller
         _productService = productService;
     }
 
-    // Helper method to check if user is logged in
     private bool IsUserLoggedIn()
     {
         return !string.IsNullOrEmpty(HttpContext.Session.GetString("Username"));
     }
 
-    // Helper method to redirect to login page
     private IActionResult RedirectToLogin(string returnUrl = null)
     {
-        if (!string.IsNullOrEmpty(returnUrl))
-        {
-            TempData["ReturnUrl"] = returnUrl;
-        }
+        
         return RedirectToAction("Login", "Account");
     }
+
 
     public async Task<IActionResult> Index()
     {
@@ -36,7 +32,7 @@ public class ProductController : Controller
 
     public IActionResult Add()
     {
-        // Check if user is logged in
+        
         if (!IsUserLoggedIn())
         {
             return RedirectToLogin("/Product/Add");
@@ -49,7 +45,7 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Add(Product product)
     {
-        // Check if user is logged in
+        
         if (!IsUserLoggedIn())
         {
             return RedirectToLogin();
@@ -65,7 +61,6 @@ public class ProductController : Controller
 
     public async Task<IActionResult> Edit(string id)
     {
-        // Check if user is logged in
         if (!IsUserLoggedIn())
         {
             return RedirectToLogin($"/Product/Edit/{id}");
@@ -76,6 +71,7 @@ public class ProductController : Controller
         {
             return NotFound();
         }
+
         return View(product);
     }
 
@@ -83,25 +79,51 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(string id, Product product)
     {
-        // Check if user is logged in
         if (!IsUserLoggedIn())
         {
             return RedirectToLogin();
         }
 
+        
+        ModelState.Remove("Id");
+
+        if (id != product.MongoId)
+        {
+            return NotFound();
+        }
+
         if (ModelState.IsValid)
         {
-            await _productService.UpdateProductAsync(id, product);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                
+                var existingProduct = await _productService.GetProductAsync(id);
+                if (existingProduct == null)
+                {
+                    return NotFound();
+                }
+
+                product.Id = existingProduct.Id;
+
+                await _productService.UpdateProductAsync(id, product);
+                TempData["SuccessMessage"] = "Ürün başarıyla güncellendi!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Güncelleme hatası: {ex.Message}";
+            }
         }
+
         return View(product);
     }
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string id)
     {
-        // Check if user is logged in
+        
         if (!IsUserLoggedIn())
         {
             return RedirectToLogin();
