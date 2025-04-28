@@ -1,0 +1,44 @@
+﻿@model ECommerceApp.Controllers.LoginViewModel
+
+@{
+    ViewData["Title"] = "Giriş Yap";
+}
+
+<h1>@ViewData["Title"]</h1>
+<div class="row">
+    <div class="col-md-4">
+        <section>
+            <form id="account" method="post" asp-action="Login">
+                @Html.AntiForgeryToken()
+                <h2>Giriş yapmak için hesabınızı kullanın.</h2>
+                <hr />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Username" class="form-control" autocomplete="username" aria-required="true" />
+                    <label asp-for="Username" class="form-label"></label>
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Password" type="password" class="form-control" autocomplete="current-password" aria-required="true" />
+                    <label asp-for="Password" class="form-label"></label>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div>
+                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Giriş Yap</button>
+                </div>
+                <div class="mt-3">
+                    <p>
+                        <a asp-action="Register">Yeni kullanıcı olarak kayıt ol?</a>
+                    </p>
+                    @*<p>
+                        <a id="forgot-password" asp-action="ForgotPassword">Şifremi Unuttum?</a>
+                    </p>*@
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

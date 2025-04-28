@@ -1,0 +1,35 @@
+﻿@model ECommerceApp.Models.User
+
+@{
+    ViewData["Title"] = "Kayıt Ol";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Register" method="post">
+            @Html.AntiForgeryToken()
+            <h4>Yeni bir hesap oluştur.</h4>
+            <hr />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-floating mb-3">
+                <input asp-for="Username" class="form-control" autocomplete="username" aria-required="true" />
+                <label asp-for="Username"></label>
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                @* Modeldeki property adı PasswordHash olsa bile, input type="password" olmalı *@
+                <input asp-for="PasswordHash" class="form-control" type="password" autocomplete="new-password" aria-required="true" />
+                <label asp-for="PasswordHash">Şifre</label>
+                <span asp-validation-for="PasswordHash" class="text-danger"></span>
+            </div>
+
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Kayıt Ol</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
